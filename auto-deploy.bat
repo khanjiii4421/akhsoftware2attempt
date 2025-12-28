@@ -4,10 +4,20 @@ echo 🚀 AUTOMATED DEPLOYMENT SETUP
 echo ========================================
 echo.
 
+echo Step 0: Setting up Git PATH...
+if exist "C:\Program Files\Git\bin\git.exe" (
+    set "PATH=%PATH%;C:\Program Files\Git\bin"
+    echo ✅ Git added to PATH
+) else if exist "C:\Program Files (x86)\Git\bin\git.exe" (
+    set "PATH=%PATH%;C:\Program Files (x86)\Git\bin"
+    echo ✅ Git added to PATH
+)
+echo.
+
 echo Step 1: Checking Git Installation...
 git --version >nul 2>&1
 if %errorlevel% neq 0 (
-    echo ❌ Git not installed!
+    echo ❌ Git not installed or not found!
     echo.
     echo Please install Git first:
     echo 1. Download from: https://git-scm.com/download/win

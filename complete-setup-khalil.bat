@@ -4,6 +4,20 @@ echo 🚀 COMPLETE SETUP - KHALIL
 echo ========================================
 echo.
 
+echo Step 0: Setting up Git PATH...
+if exist "C:\Program Files\Git\bin\git.exe" (
+    set "PATH=%PATH%;C:\Program Files\Git\bin"
+    echo ✅ Git added to PATH
+) else if exist "C:\Program Files (x86)\Git\bin\git.exe" (
+    set "PATH=%PATH%;C:\Program Files (x86)\Git\bin"
+    echo ✅ Git added to PATH
+) else (
+    echo ❌ Git not found! Please install Git from: https://git-scm.com/download/win
+    pause
+    exit /b 1
+)
+echo.
+
 echo Step 1: Setting Git User Configuration...
 git config --global user.name "khalil"
 git config --global user.email "khanjiii4421@gmail.com"
@@ -16,14 +30,18 @@ git config --global user.email
 echo.
 
 echo Step 3: Checking Git Remote...
-git remote -v >nul 2>&1
+git remote get-url origin >nul 2>&1
 if %errorlevel% equ 0 (
     echo ✅ Remote already configured
     git remote -v
+    echo.
+    echo 📝 Updating remote to new repository...
+    git remote set-url origin https://github.com/khanjiii4421/akhsoftware2attempt.git
+    echo ✅ Remote updated: https://github.com/khanjiii4421/akhsoftware2attempt.git
 ) else (
     echo 📦 Adding GitHub remote...
-    git remote add origin https://github.com/Khanjii4421/akhsoftware2attempt.git
-    echo ✅ Remote added: https://github.com/Khanjii4421/akhsoftware2attempt.git
+    git remote add origin https://github.com/khanjiii4421/akhsoftware2attempt.git
+    echo ✅ Remote added: https://github.com/khanjiii4421/akhsoftware2attempt.git
 )
 echo.
 
@@ -49,7 +67,7 @@ echo ✅ Branch set to main
 echo.
 
 echo Step 7: Pushing to GitHub...
-echo ⚠️  This will push your code to: https://github.com/Khanjii4421/akhsoftware2attempt.git
+echo ⚠️  This will push your code to: https://github.com/khanjiii4421/akhsoftware2attempt.git
 echo.
 set /p CONFIRM="Continue with push? (Y/N): "
 if /i "%CONFIRM%"=="Y" (
@@ -62,7 +80,7 @@ if /i "%CONFIRM%"=="Y" (
         echo ✅ SUCCESS! Code pushed to GitHub!
         echo ========================================
         echo.
-        echo Repository: https://github.com/Khanjii4421/akhsoftware2attempt
+        echo Repository: https://github.com/khanjiii4421/akhsoftware2attempt
         echo.
         echo Next Steps:
         echo 1. Go to Vercel: https://vercel.com
