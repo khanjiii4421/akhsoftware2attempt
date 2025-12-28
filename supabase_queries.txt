@@ -1,0 +1,133 @@
+-- Supabase Queries from server.js
+
+-- Users Table:
+
+-- Check for existing admin user:
+SELECT id FROM users WHERE username = 'admin';
+
+-- Insert default admin user:
+INSERT INTO users (username, password, role, is_blocked, blocked_until, created_at)
+VALUES ('admin', 'hashed_password', 'admin', 0, NULL, 'ISO_DATE_STRING');
+
+-- Fetch user for login:
+SELECT * FROM users WHERE username = 'provided_username';
+
+-- Unblock user:
+UPDATE users SET is_blocked = 0, blocked_until = NULL, updated_at = 'ISO_DATE_STRING' WHERE id = 'user_id';
+
+-- Insert new seller:
+INSERT INTO users (username, password, role, is_blocked, blocked_until, created_at)
+VALUES ('seller_username', 'hashed_password', 'seller', 0, NULL, 'ISO_DATE_STRING');
+
+-- Fetch all sellers:
+SELECT id, username, role, is_blocked, blocked_until, created_at FROM users WHERE role = 'seller';
+
+-- Block seller:
+UPDATE users SET is_blocked = 1, blocked_until = 'ISO_DATE_STRING', updated_at = 'ISO_DATE_STRING' WHERE id = 'seller_id';
+
+-- Unblock seller:
+UPDATE users SET is_blocked = 0, blocked_until = NULL, updated_at = 'ISO_DATE_STRING' WHERE id = 'seller_id';
+
+-- Delete seller:
+DELETE FROM users WHERE id = 'seller_id' AND role = 'seller';
+
+-- Products Table:
+
+-- Fetch products:
+SELECT * FROM products WHERE seller_name ILIKE 'seller_name' ORDER BY seller_name ASC, product_name ASC LIMIT 5000;
+-- (Conditional: if req.user.role is seller, it filters by req.user.username)
+-- (Conditional: if seller_name is provided and user is not seller, it filters by seller_name)
+
+-- Check for existing product (case-insensitive):
+SELECT id FROM products WHERE seller_name ILIKE 'seller_name' AND product_name ILIKE 'product_name';
+
+-- Update existing product:
+UPDATE products SET price = 'new_price', updated_at = 'ISO_DATE_STRING' WHERE id = 'product_id';
+
+-- Insert new product:
+INSERT INTO products (seller_name, product_name, price, created_at)
+VALUES ('normalized_seller_name', 'normalized_product_name', 'price', 'ISO_DATE_STRING');
+
+-- Bulk upsert products:
+INSERT INTO products (seller_name, product_name, price, created_at, updated_at)
+VALUES
+('normalized_seller_name_1', 'normalized_product_name_1', 'price_1', 'ISO_DATE_STRING', 'ISO_DATE_STRING'),
+('normalized_seller_name_2', 'normalized_product_name_2', 'price_2', 'ISO_DATE_STRING', 'ISO_DATE_STRING')
+ON CONFLICT (seller_name, product_name) DO UPDATE SET price = EXCLUDED.price, updated_at = EXCLUDED.updated_at;
+
+-- Delete product:
+DELETE FROM products WHERE id = 'product_id';
+
+-- Fetch all products for a seller (for debugging shipper price calculation):
+SELECT product_name, price, seller_name FROM products WHERE seller_name ILIKE 'seller_name';
+
+-- Fetch products for shipper price calculation:
+SELECT product_name, price FROM products WHERE seller_name ILIKE 'seller_name' AND product_name IN ('product_name_1', 'product_name_2', ...);
+
+-- Orders Table:
+
+-- Fetch orders:
+SELECT * FROM orders WHERE seller_name ILIKE 'seller_name' AND status = 'status_value' AND shipper_paid = 'shipper_paid_value' ORDER BY created_at DESC LIMIT 10000;
+-- (Conditional: filters by req.user.username if user is seller)
+-- (Conditional: filters by seller_name if provided and user is not seller)
+-- (Conditional: filters by status if provided)
+-- (Conditional: filters by shipper_paid if provided)
+
+-- Insert new order:
+INSERT INTO orders (order_number, seller_name, customer_name, customer_address, city, phone1, phone2, seller_price, dc, shipper_price, profit, products, status, shipper_paid, created_at, updated_at)
+VALUES ('order_number', 'normalized_seller_name', 'customer_name', 'customer_address', 'city', 'phone1', 'phone2', 'seller_price', 'dc', 'shipper_price', 'profit', 'products_string', 'pending', 0, 'ISO_DATE_STRING', 'ISO_DATE_STRING');
+
+-- Fetch existing order for update:
+SELECT * FROM orders WHERE id = 'order_id';
+
+-- Update order:
+UPDATE orders SET
+    customer_name = 'new_customer_name',
+    customer_address = 'new_customer_address',
+    city = 'new_city',
+    phone1 = 'new_phone1',
+    phone2 = 'new_phone2',
+    products = 'new_products_string',
+    seller_price = 'new_seller_price',
+    dc = 'new_dc',
+    shipper_price = 'new_shipper_price',
+    profit = 'new_profit',
+    tracking_id = 'new_tracking_id',
+    status = 'new_status',
+    shipper_paid = 'new_shipper_paid',
+    updated_at = 'ISO_DATE_STRING'
+WHERE id = 'order_id';
+
+-- Count all orders (for delete-all):
+SELECT count(*) FROM orders;
+
+-- Delete all orders:
+DELETE FROM orders WHERE id != 0; -- A condition that always evaluates to true
+
+-- Count orders for a seller (for delete-all-for-seller):
+SELECT count(*) FROM orders WHERE seller_name ILIKE 'seller_name';
+
+-- Delete all orders for a seller:
+DELETE FROM orders WHERE seller_name ILIKE 'seller_name';
+
+-- Fetch order seller_name for delete (single order):
+SELECT seller_name FROM orders WHERE id = 'order_id';
+
+-- Delete single order:
+DELETE FROM orders WHERE id = 'order_id';
+
+-- Bulk update order status by tracking_id:
+UPDATE orders SET status = 'new_status', updated_at = 'ISO_DATE_STRING' WHERE tracking_id = 'tracking_id_value' AND seller_name = 'seller_name';
+
+-- Bulk update order status by order_number:
+UPDATE orders SET status = 'new_status', updated_at = 'ISO_DATE_STRING' WHERE order_number = 'order_number_value' AND seller_name = 'seller_name';
+
+-- Bulk update tracking IDs by order_number:
+UPDATE orders SET tracking_id = 'new_tracking_id', updated_at = 'ISO_DATE_STRING' WHERE seller_name = 'seller_name' AND order_number = 'order_number_value';
+
+-- Dispatched Parcels Table:
+
+-- Insert dispatched parcel:
+INSERT INTO dispatched_parcels (tracking_id, courier, dispatch_date, dispatch_time)
+VALUES ('tracking_id', 'courier_name', 'dispatch_date_string', 'dispatch_time_string');
+

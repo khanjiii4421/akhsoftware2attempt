@@ -1,0 +1,83 @@
+===========================================
+🚀 GITHUB PUSH - QUICK COMMANDS
+===========================================
+
+STEP 1: Git Install Verify
+---------------------------
+git --version
+
+(If error, install Git from: https://git-scm.com/download/win)
+
+
+STEP 2: Project Folder Mein Jayen
+-----------------------------------
+cd "C:\Users\ThinkPad\Desktop\Adnan software kamalia"
+
+
+STEP 3: Git Initialize (Agar Pehle Se Nahi Hai)
+------------------------------------------------
+git init
+
+
+STEP 4: Sab Files Add Karen
+----------------------------
+git add .
+
+
+STEP 5: Commit Karen
+---------------------
+git commit -m "Initial commit: Order Management System"
+
+
+STEP 6: GitHub Repository Connect Karen
+---------------------------------------
+git remote add origin https://github.com/YOUR_USERNAME/REPO_NAME.git
+
+(Replace YOUR_USERNAME and REPO_NAME with your details)
+
+
+STEP 7: Branch Set Karen
+------------------------
+git branch -M main
+
+
+STEP 8: Push Karen
+------------------
+git push -u origin main
+
+(Username aur Personal Access Token mang sakta hai)
+
+
+===========================================
+📝 FUTURE UPDATES (Code Change Ke Baad)
+===========================================
+
+git add .
+git commit -m "Your message here"
+git push origin main
+
+
+===========================================
+🔐 PERSONAL ACCESS TOKEN CREATE KARNE KE LIYE
+===========================================
+
+1. GitHub.com → Settings → Developer settings
+2. Personal access tokens → Tokens (classic)
+3. Generate new token (classic)
+4. Note: "Deployment Token"
+5. Expiration: 90 days
+6. Scopes: ✅ repo (check karein)
+7. Generate token → Copy karein (sirf ek baar dikhega!)
+
+
+===========================================
+✅ VERIFY KARNE KE LIYE
+===========================================
+
+git status          # Current status
+git remote -v       # Remote repository check
+git log            # Commit history
+
+
+===========================================
+

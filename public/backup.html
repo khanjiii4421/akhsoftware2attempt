@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backup & Restore</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">Order Management</div>
+        <div class="nav-right">
+            <span id="userInfo"></span>
+            <button onclick="logout()" class="btn-logout">Logout</button>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html">📊 Dashboard</a></li>
+                <li><a href="orders.html">📦 Orders</a></li>
+                <li><a href="products.html">🛍️ Products</a></li>
+                <li><a href="billing.html">💰 Billing</a></li>
+                <li><a href="bills.html">📄 Bills History</a></li>
+                <li><a href="dispatched.html">📤 Dispatched</a></li>
+                <li><a href="employees.html">👥 Employee Management</a></li>
+                <li><a href="automation.html">⚡ Automation</a></li>
+                <li><a href="return-scan.html">📷 Return Scan</a></li>
+                <li><a href="backup.html" class="active">💾 Backup & Restore</a></li>
+                <li><a href="sellers.html" id="sellersLink" style="display: none;">👥 Sellers</a></li>
+            </ul>
+        </aside>
+
+        <div class="container">
+            <div class="page-header">
+                <h1 style="color: #ff8c00;">💾 Backup & Restore</h1>
+                <p style="color: #000; margin-top: 5px;">Backup your data to Google Drive or download locally</p>
+            </div>
+
+            <!-- Backup Section -->
+            <div class="card" style="margin-bottom: 30px;">
+                <h2 style="color: #ff8c00; margin-bottom: 20px; border-bottom: 2px solid #ff8c00; padding-bottom: 10px;">
+                    📤 Create Backup
+                </h2>
+                <p style="color: #000; margin-bottom: 20px;">
+                    Create a complete backup of your database including orders, products, bills, and users.
+                </p>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                    <button onclick="createBackup()" class="btn-primary" style="padding: 15px; font-size: 16px;">
+                        💾 Create Backup Now
+                    </button>
+                    <button onclick="downloadBackup('excel')" class="btn-secondary" style="padding: 15px; font-size: 16px;" id="downloadBackupBtn" disabled>
+                        ⬇️ Download All Data (Excel)
+                    </button>
+                    <button onclick="downloadBackup('csv')" class="btn-secondary" style="padding: 15px; font-size: 16px;" id="downloadBackupCSVBtn" disabled>
+                        ⬇️ Download All Data (CSV)
+                    </button>
+                </div>
+                
+                <div style="margin-top: 20px; padding: 20px; background: white; border-radius: 8px; border: 1px solid #000;">
+                    <h3 style="color: #ff8c00; margin-top: 0; margin-bottom: 15px;">📥 Download Individual Data Types</h3>
+                    <p style="color: #000; margin-bottom: 15px;">Download specific data types separately:</p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                        <button onclick="downloadSpecificData('orders')" class="btn-secondary" style="padding: 12px; font-size: 14px;" id="downloadOrdersBtn" disabled>
+                            📦 Download Orders
+                        </button>
+                        <button onclick="downloadSpecificData('products')" class="btn-secondary" style="padding: 12px; font-size: 14px;" id="downloadProductsBtn" disabled>
+                            🛍️ Download Products
+                        </button>
+                        <button onclick="downloadSpecificData('bills')" class="btn-secondary" style="padding: 12px; font-size: 14px;" id="downloadBillsBtn" disabled>
+                            📄 Download Bills
+                        </button>
+                        <button onclick="downloadSpecificData('dispatched')" class="btn-secondary" style="padding: 12px; font-size: 14px;" id="downloadDispatchedBtn" disabled>
+                            📤 Download Dispatched
+                        </button>
+                        <button onclick="downloadSpecificData('users')" class="btn-secondary" style="padding: 12px; font-size: 14px;" id="downloadUsersBtn" disabled>
+                            👥 Download Users
+                        </button>
+                    </div>
+                </div>
+
+                <div id="backupStatus" style="display: none; padding: 15px; border-radius: 8px; margin-top: 15px;"></div>
+            </div>
+
+            <!-- Automatic Backup Section -->
+            <div class="card" style="margin-bottom: 30px;">
+                <h2 style="color: #ff8c00; margin-bottom: 20px; border-bottom: 2px solid #ff8c00; padding-bottom: 10px;">
+                    ⚡ Automatic Weekly Backup
+                </h2>
+                <p style="color: #000; margin-bottom: 20px;">
+                    Enable automatic backups that run every week. Backups are saved to the server and can be synced to Google Drive.
+                </p>
+
+                <div id="autoBackupSettings" style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #000;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                        <div>
+                            <label style="display: flex; align-items: center; gap: 10px; font-weight: bold; color: #000; margin-bottom: 10px;">
+                                <input type="checkbox" id="autoBackupEnabled" onchange="updateAutoBackupSettings()" style="width: 20px; height: 20px;">
+                                Enable Automatic Backup
+                            </label>
+                            <small style="color: #000;">Backups run every Sunday at 2:00 AM</small>
+                        </div>
+                        <div>
+                            <label style="display: block; font-weight: bold; color: #000; margin-bottom: 5px;">Email Account</label>
+                            <input type="email" id="autoBackupEmail" placeholder="Your email" 
+                                   style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 5px; font-size: 14px;"
+                                   onchange="updateAutoBackupSettings()">
+                        </div>
+                    </div>
+                    
+                    <div id="autoBackupStatus" style="padding: 15px; background: white; border-radius: 5px; border-left: 4px solid #000; margin-top: 15px;">
+                        <p style="margin: 0; color: #000;"><strong>Status:</strong> <span id="autoBackupStatusText">Loading...</span></p>
+                        <p style="margin: 5px 0 0 0; color: #000;"><strong>Last Backup:</strong> <span id="lastBackupDate">-</span></p>
+                        <p style="margin: 5px 0 0 0; color: #000;"><strong>Next Backup:</strong> <span id="nextBackupDate">-</span></p>
+                    </div>
+
+                    <div style="margin-top: 15px;">
+                        <button onclick="triggerManualBackup()" class="btn-primary" style="padding: 10px 20px; font-size: 14px;">
+                            🔄 Trigger Backup Now
+                        </button>
+                    </div>
+                </div>
+
+                <div id="autoBackupMessage" style="display: none; padding: 15px; border-radius: 8px; margin-top: 15px;"></div>
+            </div>
+
+            <!-- Google Drive Section -->
+            <div class="card" style="margin-bottom: 30px;">
+                <h2 style="color: #ff8c00; margin-bottom: 20px; border-bottom: 2px solid #ff8c00; padding-bottom: 10px;">
+                    ☁️ Google Drive Backup
+                </h2>
+                <p style="color: #000; margin-bottom: 20px;">
+                    Automatic backups are saved to the server's "backups" folder. You can manually sync these files to Google Drive or set up Google Drive sync.
+                </p>
+
+                <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #ff8c00; border: 1px solid #000;">
+                    <h3 style="color: #ff8c00; margin-top: 0;">How to backup to Google Drive:</h3>
+                    <ol style="color: #000; line-height: 1.8;">
+                        <li>Click "Create Backup Now" above to generate a backup file</li>
+                        <li>Click "Download Backup" to save the file to your device</li>
+                        <li>Go to <a href="https://drive.google.com" target="_blank" style="color: #000; font-weight: bold;">Google Drive</a></li>
+                        <li>Upload the downloaded backup file to your Google Drive</li>
+                        <li>Your data is now safely backed up in the cloud!</li>
+                    </ol>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                    <button onclick="openGoogleDrive()" class="btn-primary" style="padding: 15px; font-size: 16px;">
+                        🔗 Open Google Drive
+                    </button>
+                    <button onclick="uploadToDrive()" class="btn-secondary" style="padding: 15px; font-size: 16px;" id="uploadToDriveBtn" disabled>
+                        ☁️ Upload to Drive
+                    </button>
+                </div>
+
+                <div id="driveStatus" style="display: none; padding: 15px; border-radius: 8px; margin-top: 15px;"></div>
+            </div>
+
+            <!-- Restore Section -->
+            <div class="card">
+                <h2 style="color: #ff8c00; margin-bottom: 20px; border-bottom: 2px solid #ff8c00; padding-bottom: 10px;">
+                    📥 Restore from Backup
+                </h2>
+                <p style="color: #000; margin-bottom: 20px;">
+                    <strong style="color: #000;">Warning:</strong> Restoring will replace all current data with the backup data. 
+                    Make sure to create a backup before restoring.
+                </p>
+
+                <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #ff8c00; border: 1px solid #000;">
+                    <h3 style="color: #ff8c00; margin-top: 0;">⚠️ Important Notes:</h3>
+                    <ul style="color: #000; line-height: 1.8;">
+                        <li>Restoring will delete all current orders, products, bills, and users</li>
+                        <li>Only restore from trusted backup files</li>
+                        <li>Create a backup before restoring to avoid data loss</li>
+                        <li>This action cannot be undone</li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 10px; font-weight: bold; color: #000;">
+                        Select Backup File
+                    </label>
+                    <input type="file" id="restoreFileInput" accept=".json" 
+                           style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; margin-bottom: 15px;">
+                    <small style="color: #000;">Select a backup JSON file to restore from</small>
+                </div>
+
+                <div style="display: flex; gap: 15px;">
+                    <button onclick="restoreBackup()" class="btn-danger" style="padding: 15px 30px; font-size: 16px;">
+                        🔄 Restore Backup
+                    </button>
+                    <button onclick="previewBackup()" class="btn-secondary" style="padding: 15px 30px; font-size: 16px;">
+                        👁️ Preview Backup
+                    </button>
+                </div>
+
+                <div id="restoreStatus" style="display: none; padding: 15px; border-radius: 8px; margin-top: 15px;"></div>
+                <div id="backupPreview" style="display: none; margin-top: 20px; padding: 20px; background: white; border-radius: 8px; border: 1px solid #000;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="auth.js"></script>
+    <script src="mobile-menu.js"></script>
+    <script src="backup.js"></script>
+    <script>
+        // Show sellers link for admin
+        window.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const sellersLink = document.getElementById('sellersLink');
+            if (sellersLink && user.role === 'admin') {
+                sellersLink.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
+

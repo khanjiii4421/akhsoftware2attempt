@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">Order Management</div>
+        <div class="nav-right">
+            <span id="userInfo"></span>
+            <button onclick="logout()" class="btn-logout">Logout</button>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html">📊 Dashboard</a></li>
+                <li><a href="orders.html" class="active">📦 Orders</a></li>
+                <li><a href="products.html">🛍️ Products</a></li>
+                <li><a href="billing.html">💰 Billing</a></li>
+                <li><a href="bills.html">📄 Bills History</a></li>
+                <li><a href="dispatched.html">📤 Dispatched</a></li>
+                <li><a href="employees.html">👥 Employee Management</a></li>
+                <li><a href="automation.html">⚡ Automation</a></li>
+                <li><a href="return-scan.html">📷 Return Scan</a></li>
+                <li><a href="backup.html">💾 Backup & Restore</a></li>
+                <li><a href="sellers.html" id="sellersLink" style="display: none;">👥 Sellers</a></li>
+            </ul>
+        </aside>
+
+        <div class="container">
+        <div class="page-header">
+            <h1 style="color: #ff8c00;">Orders Management</h1>
+            <div class="header-actions">
+                <button onclick="openAddOrderModal()" class="btn-primary">Add Order</button>
+                <button onclick="downloadOrderTemplate()" class="btn-secondary">Download Template</button>
+                <button onclick="openBulkUploadModal()" class="btn-secondary">Bulk Upload</button>
+                <button onclick="downloadOrders()" class="btn-secondary">Download</button>
+                <button onclick="deleteAllOrders()" class="btn-danger" id="deleteAllOrdersBtn" style="display: none; background-color: #e74c3c;">Delete All Orders</button>
+            </div>
+        </div>
+
+        <div class="filters">
+            <select id="sellerFilter" onchange="loadOrders()">
+                <option value="">All Sellers</option>
+            </select>
+            <select id="statusFilter" onchange="loadOrders()">
+                <option value="">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="delivered">Delivered</option>
+                <option value="return">Return</option>
+                <option value="cancel">Cancel</option>
+            </select>
+            <select id="paidFilter" onchange="loadOrders()">
+                <option value="">All</option>
+                <option value="1">Paid</option>
+                <option value="0">Unpaid</option>
+            </select>
+            <input type="text" id="searchInput" placeholder="Search by order number, seller, customer, phone, tracking ID..." onkeyup="searchOrders()">
+        </div>
+
+        <!-- Return Scan Section -->
+        <div class="scan-section" style="background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <h3 style="color: #ff8c00; margin-bottom: 15px;">🔄 Return Scan</h3>
+            <div style="display: flex; gap: 10px; align-items: flex-end;">
+                <div style="flex: 1;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">Tracking ID</label>
+                    <input type="text" id="returnScanInput" placeholder="Scan or enter tracking ID (auto-scans after typing)" 
+                           style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;"
+                           onkeypress="if(event.key === 'Enter') scanReturn()">
+                </div>
+                <div>
+                    <button onclick="scanReturn()" class="btn-primary" style="padding: 12px 24px; font-weight: 600; height: fit-content;">Mark as Return</button>
+                </div>
+            </div>
+            <div id="returnScanResult" style="margin-top: 15px; display: none;"></div>
+        </div>
+
+        <div class="table-container">
+            <table id="ordersTable" class="data-table">
+                <thead>
+                    <tr>
+                        <th>Order #</th>
+                        <th>Seller</th>
+                        <th>Customer</th>
+                        <th>Address</th>
+                        <th>City</th>
+                        <th>Phone 1</th>
+                        <th>Phone 2</th>
+                        <th>Products</th>
+                        <th>Seller Price</th>
+                        <th>DC</th>
+                        <th>Shipper Price</th>
+                        <th>Profit</th>
+                        <th>Tracking ID</th>
+                        <th>Status</th>
+                        <th>Paid</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                </tbody>
+            </table>
+            
+            <!-- Pagination Info -->
+            <div id="paginationInfo" style="text-align: center; padding: 15px; color: #000; font-weight: 500;">
+                Loading...
+            </div>
+            
+            <!-- Pagination Controls -->
+            <div id="paginationControls" style="margin-bottom: 20px;">
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Order Modal -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeOrderModal()">&times;</span>
+            <h2 id="modalTitle" style="color: #ff8c00;">Add Order</h2>
+            <form id="orderForm">
+                <input type="hidden" id="orderId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Order Number *</label>
+                        <input type="text" id="orderNumber" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Seller Name *</label>
+                        <select id="sellerName" required>
+                            <option value="">Select Seller</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Customer Name *</label>
+                        <input type="text" id="customerName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>City *</label>
+                        <input type="text" id="city" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Customer Address *</label>
+                    <textarea id="customerAddress" required></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Phone 1 *</label>
+                        <input type="text" id="phone1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone 2</label>
+                        <input type="text" id="phone2">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Products (comma separated) *</label>
+                        <input type="text" id="products" placeholder="ks1,ks1 or pk1,ks1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Seller Price *</label>
+                        <input type="number" step="0.01" id="sellerPrice" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>DC</label>
+                        <input type="number" step="0.01" id="dc" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Tracking ID</label>
+                        <input type="text" id="trackingId">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="status">
+                            <option value="pending">Pending</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="return">Return</option>
+                            <option value="cancel">Cancel</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Shipper Paid</label>
+                        <select id="shipperPaid">
+                            <option value="0">Unpaid</option>
+                            <option value="1">Paid</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Save</button>
+                    <button type="button" onclick="closeOrderModal()" class="btn-secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Bulk Upload Modal -->
+    <div id="bulkUploadModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeBulkUploadModal()">&times;</span>
+            <h2 style="color: #ff8c00;">Bulk Upload Orders</h2>
+            <div class="form-group">
+                <label>Upload Excel File</label>
+                <input type="file" id="bulkFileInput" accept=".xlsx,.xls">
+                <small>Excel format with columns: Order Number, Seller Name, Customer Name, Address, City, Phone 1, Phone 2, Products, Seller Price, DC, Tracking ID (optional)</small>
+                <br><br>
+                <button type="button" onclick="downloadOrderTemplate()" class="btn-secondary" style="margin-top: 10px;">Download Template</button>
+            </div>
+            <button id="bulkUploadBtn" onclick="processBulkUpload()" class="btn-primary">Upload</button>
+            
+            <!-- Loading Indicator -->
+            <div id="bulkUploadLoading" style="display: none; text-align: center; padding: 20px; margin-top: 20px;">
+                <div style="display: inline-block; width: 60px; height: 60px; border: 6px solid #f3f3f3; border-top: 6px solid #000; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                <p style="margin-top: 15px; font-size: 16px; font-weight: bold; color: #000;" id="loadingText">Processing orders...</p>
+                <p style="margin-top: 10px; color: #000; font-size: 14px;" id="loadingProgress">Please wait, this may take a moment...</p>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Optimize table performance */
+        .table-container {
+            will-change: scroll-position;
+            contain: layout style paint;
+        }
+        
+        .data-table {
+            table-layout: fixed;
+        }
+        
+        /* Address and Customer Name - Vertical wrapping */
+        .data-table th:nth-child(3),
+        .data-table td:nth-child(3) {
+            width: 150px;
+            max-width: 150px;
+            min-width: 150px;
+        }
+        
+        .data-table th:nth-child(4),
+        .data-table td:nth-child(4) {
+            width: 200px;
+            max-width: 200px;
+            min-width: 200px;
+        }
+        
+        .data-table td:nth-child(3),
+        .data-table td:nth-child(4) {
+            word-wrap: break-word;
+            word-break: break-word;
+            white-space: normal;
+            line-height: 1.5;
+            vertical-align: top;
+            padding-top: 12px;
+            padding-bottom: 12px;
+            overflow-wrap: break-word;
+            hyphens: auto;
+        }
+        
+        /* Optimize all cells */
+        .data-table td {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+        }
+        
+        /* Smooth scrolling */
+        .table-container {
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+        }
+        
+        /* Performance optimizations */
+        .data-table tbody {
+            contain: layout style paint;
+        }
+        
+        .data-table tbody tr {
+            contain: layout style;
+        }
+        
+        /* Prevent layout shifts */
+        .data-table td,
+        .data-table th {
+            box-sizing: border-box;
+        }
+        
+        /* Fixed column widths for better performance */
+        .data-table th:nth-child(1),
+        .data-table td:nth-child(1) { width: 120px; } /* Order # */
+        .data-table th:nth-child(2),
+        .data-table td:nth-child(2) { width: 100px; } /* Seller */
+        .data-table th:nth-child(5),
+        .data-table td:nth-child(5) { width: 100px; } /* City */
+        .data-table th:nth-child(6),
+        .data-table td:nth-child(6) { width: 110px; } /* Phone 1 */
+        .data-table th:nth-child(7),
+        .data-table td:nth-child(7) { width: 110px; } /* Phone 2 */
+        .data-table th:nth-child(8),
+        .data-table td:nth-child(8) { width: 150px; } /* Products */
+        .data-table th:nth-child(9),
+        .data-table td:nth-child(9) { width: 100px; text-align: right; } /* Seller Price */
+        .data-table th:nth-child(10),
+        .data-table td:nth-child(10) { width: 80px; text-align: right; } /* DC */
+        .data-table th:nth-child(11),
+        .data-table td:nth-child(11) { width: 100px; text-align: right; } /* Shipper Price */
+        .data-table th:nth-child(12),
+        .data-table td:nth-child(12) { width: 90px; text-align: right; } /* Profit */
+        .data-table th:nth-child(13),
+        .data-table td:nth-child(13) { width: 120px; } /* Tracking ID */
+        .data-table th:nth-child(14),
+        .data-table td:nth-child(14) { width: 110px; } /* Status */
+        .data-table th:nth-child(15),
+        .data-table td:nth-child(15) { width: 90px; } /* Paid */
+        .data-table th:nth-child(16),
+        .data-table td:nth-child(16) { width: 280px; } /* Actions */
+    </style>
+
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    <script src="config.js"></script>
+    <script src="auth.js"></script>
+    <script src="mobile-menu.js"></script>
+    <script src="orders.js"></script>
+    <script>
+        // Show sellers link for admin
+        window.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const sellersLink = document.getElementById('sellersLink');
+            if (sellersLink && user.role === 'admin') {
+                sellersLink.style.display = 'block';
+            }
+            
+            // Optimize table performance with virtual scrolling hints
+            const tableContainer = document.querySelector('.table-container');
+            if (tableContainer) {
+                // Use CSS containment for better performance
+                tableContainer.style.contain = 'layout style paint';
+                
+                // Smooth scrolling with passive listeners for better performance
+                tableContainer.addEventListener('scroll', () => {
+                    // Throttle scroll events if needed
+                }, { passive: true });
+            }
+        });
+    </script>
+</body>
+</html>
+

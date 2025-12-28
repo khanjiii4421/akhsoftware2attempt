@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billing</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">Order Management</div>
+        <div class="nav-right">
+            <span id="userInfo"></span>
+            <button onclick="logout()" class="btn-logout">Logout</button>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html">📊 Dashboard</a></li>
+                <li><a href="orders.html">📦 Orders</a></li>
+                <li><a href="products.html">🛍️ Products</a></li>
+                <li><a href="billing.html" class="active">💰 Billing</a></li>
+                <li><a href="bills.html">📄 Bills History</a></li>
+                <li><a href="dispatched.html">📤 Dispatched</a></li>
+                <li><a href="employees.html">👥 Employee Management</a></li>
+                <li><a href="automation.html">⚡ Automation</a></li>
+                <li><a href="return-scan.html">📷 Return Scan</a></li>
+                <li><a href="backup.html">💾 Backup & Restore</a></li>
+                <li><a href="sellers.html" id="sellersLink" style="display: none;">👥 Sellers</a></li>
+            </ul>
+        </aside>
+
+        <div class="container">
+            <div class="page-header">
+                <h1 style="color: #ff8c00;">Billing</h1>
+                <div class="header-actions" style="display: flex; gap: 10px; align-items: center;">
+                    <select id="sellerSelect" onchange="onSellerChange()" style="padding: 10px; border-radius: 5px; border: 2px solid #e0e0e0; font-size: 14px;">
+                        <option value="">Select Seller</option>
+                    </select>
+                    <div id="billNumberContainer" style="display: none;">
+                        <input type="text" id="billNumber" placeholder="Bill Number (Optional)" style="padding: 10px; border-radius: 5px; border: 2px solid #e0e0e0; font-size: 14px; width: 150px;" onkeypress="if(event.key === 'Enter') loadBill()">
+                        <button onclick="loadBill()" class="btn-primary" style="margin-left: 10px;">Generate Bill</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="billSummary" style="display: none; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h2 style="color: #ff8c00; margin: 0;">Bill Summary</h2>
+                    <div id="billNumberDisplay" style="font-size: 16px; font-weight: bold; color: #000;"></div>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #000;">
+                        <h3 style="color: #ff8c00; font-size: 14px; margin-bottom: 5px;">Total Orders</h3>
+                        <p id="summaryTotalOrders" style="font-size: 24px; font-weight: bold; color: #000;">0</p>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #000;">
+                        <h3 style="color: #ff8c00; font-size: 14px; margin-bottom: 5px;">Delivered</h3>
+                        <p id="summaryDelivered" style="font-size: 24px; font-weight: bold; color: #000;">0</p>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #000;">
+                        <h3 style="color: #ff8c00; font-size: 14px; margin-bottom: 5px;">Returns</h3>
+                        <p id="summaryReturns" style="font-size: 24px; font-weight: bold; color: #000;">0</p>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #000;">
+                        <h3 style="color: #ff8c00; font-size: 14px; margin-bottom: 5px;">Total Profit</h3>
+                        <p id="summaryProfit" style="font-size: 24px; font-weight: bold; color: #000;">0.00</p>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #000;">
+                        <h3 style="color: #ff8c00; font-size: 14px; margin-bottom: 5px;">Delivered Ratio</h3>
+                        <p id="summaryDeliveredRatio" style="font-size: 24px; font-weight: bold; color: #000;">0%</p>
+                    </div>
+                    <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #000;">
+                        <h3 style="color: #ff8c00; font-size: 14px; margin-bottom: 5px;">Return Ratio</h3>
+                        <p id="summaryReturnRatio" style="font-size: 24px; font-weight: bold; color: #000;">0%</p>
+                    </div>
+                </div>
+                <div style="margin-top: 20px; display: flex; gap: 10px;">
+                    <button onclick="exportToPDF()" class="btn-primary">Export PDF</button>
+                    <button onclick="exportToXLS()" class="btn-secondary">Export Excel</button>
+                    <button onclick="markAsPaid()" class="btn-primary">Mark as Paid</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="billTable" class="data-table" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Seller</th>
+                            <th>Customer</th>
+                            <th>Product</th>
+                            <th>Seller Price</th>
+                            <th>DC</th>
+                            <th>Shipper Price</th>
+                            <th>Profit</th>
+                            <th>Tracking ID</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="billTableBody">
+                    </tbody>
+                </table>
+                <div id="noBillMessage" style="text-align: center; padding: 40px; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <p style="font-size: 18px; color: #000;">Please select a seller to generate bill</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="auth.js"></script>
+    <script src="mobile-menu.js"></script>
+    <script src="billing.js"></script>
+    <script>
+        // Show sellers link for admin
+        window.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const sellersLink = document.getElementById('sellersLink');
+            if (sellersLink && user.role === 'admin') {
+                sellersLink.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
+

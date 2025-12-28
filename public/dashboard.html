@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">Order Management</div>
+        <div class="nav-right">
+            <span id="userInfo"></span>
+            <button onclick="logout()" class="btn-logout">Logout</button>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html" class="active">📊 Dashboard</a></li>
+                <li><a href="orders.html">📦 Orders</a></li>
+                <li><a href="products.html">🛍️ Products</a></li>
+                <li><a href="billing.html">💰 Billing</a></li>
+                <li><a href="bills.html">📄 Bills History</a></li>
+                <li><a href="dispatched.html">📤 Dispatched</a></li>
+                <li><a href="employees.html">👥 Employee Management</a></li>
+                <li><a href="automation.html">⚡ Automation</a></li>
+                <li><a href="return-scan.html">📷 Return Scan</a></li>
+                <li><a href="backup.html">💾 Backup & Restore</a></li>
+                <li><a href="sellers.html" id="sellersLink" style="display: none;">👥 Sellers</a></li>
+            </ul>
+        </aside>
+
+        <div class="container">
+        <div class="page-header">
+            <h1 style="color: #ff8c00;">Dashboard</h1>
+            <select id="sellerFilter" onchange="loadDashboard()">
+                <option value="">All Sellers</option>
+            </select>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Orders</h3>
+                <p id="totalOrders">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Pending Orders</h3>
+                <p id="totalPending">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Delivered</h3>
+                <p id="totalDelivered">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Returns</h3>
+                <p id="totalReturns">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Paid</h3>
+                <p id="totalPaid">0</p>
+            </div>
+        </div>
+
+        <div class="financial-grid">
+            <div class="stat-card">
+                <h3>Total Seller Price (Delivered)</h3>
+                <p id="totalSellerPrice">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Total Shipper Price (Delivered)</h3>
+                <p id="totalShipperPrice">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Total DC (Delivered)</h3>
+                <p id="totalDC">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Total Profit (Delivered)</h3>
+                <p id="totalProfit">0</p>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3>City Wise Sales (Vertical)</h3>
+                <canvas id="citySalesChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>Top Sellers</h3>
+                <canvas id="topSellersChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>Top Products</h3>
+                <canvas id="topProductsChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>Delivered vs Returns</h3>
+                <canvas id="deliveredReturnsChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>Sales Trends</h3>
+                <select id="trendPeriod" onchange="loadSalesTrends()">
+                    <option value="day">Daily</option>
+                    <option value="week">Weekly</option>
+                    <option value="month">Monthly</option>
+                </select>
+                <canvas id="salesTrendsChart"></canvas>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="auth.js"></script>
+    <script src="mobile-menu.js"></script>
+    <script src="dashboard.js"></script>
+    <script>
+        // Show sellers link for admin
+        window.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const sellersLink = document.getElementById('sellersLink');
+            if (sellersLink && user.role === 'admin') {
+                sellersLink.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sellers Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">Order Management</div>
+        <div class="nav-right">
+            <span id="userInfo"></span>
+            <button onclick="logout()" class="btn-logout">Logout</button>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html">📊 Dashboard</a></li>
+                <li><a href="orders.html">📦 Orders</a></li>
+                <li><a href="products.html">🛍️ Products</a></li>
+                <li><a href="billing.html">💰 Billing</a></li>
+                <li><a href="bills.html">📄 Bills History</a></li>
+                <li><a href="dispatched.html">📤 Dispatched</a></li>
+                <li><a href="employees.html">👥 Employee Management</a></li>
+                <li><a href="automation.html">⚡ Automation</a></li>
+                <li><a href="return-scan.html">📷 Return Scan</a></li>
+                <li><a href="backup.html">💾 Backup & Restore</a></li>
+                <li><a href="sellers.html" class="active">👥 Sellers</a></li>
+            </ul>
+        </aside>
+
+        <div class="container">
+        <div class="page-header">
+            <h1 style="color: #ff8c00;">Sellers Management</h1>
+            <button onclick="openAddSellerModal()" class="btn-primary">Create Seller</button>
+        </div>
+
+        <div class="table-container">
+            <table id="sellersTable" class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Blocked Until</th>
+                        <th>Created At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="sellersTableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add Seller Modal -->
+    <div id="sellerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeSellerModal()">&times;</span>
+            <h2 style="color: #ff8c00;">Create Seller</h2>
+            <form id="sellerForm">
+                <div class="form-group">
+                    <label>Username *</label>
+                    <input type="text" id="sellerUsername" required>
+                </div>
+                <div class="form-group">
+                    <label>Password *</label>
+                    <input type="password" id="sellerPassword" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Create</button>
+                    <button type="button" onclick="closeSellerModal()" class="btn-secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Block Seller Modal -->
+    <div id="blockSellerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeBlockSellerModal()">&times;</span>
+            <h2 style="color: #ff8c00;">Block Seller</h2>
+            <div class="form-group">
+                <label>Block for (hours) *</label>
+                <input type="number" id="blockHours" min="1" value="24" required>
+            </div>
+            <div class="form-actions">
+                <button onclick="processBlockSeller()" class="btn-danger">Block</button>
+                <button onclick="closeBlockSellerModal()" class="btn-secondary">Cancel</button>
+            </div>
+        </div>
+        </div>
+    </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="auth.js"></script>
+    <script src="mobile-menu.js"></script>
+    <script src="sellers.js"></script>
+</body>
+</html>
+

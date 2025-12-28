@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Status Update - Automation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body.automation-page {
+            background: white;
+            min-height: 100vh;
+        }
+        .automation-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e0e0e0;
+            padding: 30px;
+            margin: 20px auto;
+        }
+        .automation-card h2 {
+            color: #ff8c00;
+            margin-bottom: 25px;
+            font-size: 24px;
+            border-bottom: 3px solid #ff8c00;
+            padding-bottom: 10px;
+        }
+        .automation-card h3 {
+            color: #ff8c00;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        .form-group label {
+            color: #000;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 12px;
+            transition: all 0.3s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: #000;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary {
+            background: white;
+            color: #000;
+            border: 2px solid #000;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+        .btn-secondary {
+            background: white;
+            color: #000;
+            border: 2px solid #000;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        .btn-secondary:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .section-divider {
+            height: 2px;
+            background: #000;
+            margin: 40px 0;
+        }
+        .success-message {
+            background: white;
+            border: 2px solid #000;
+            border-radius: 10px;
+            padding: 20px;
+            color: #000;
+        }
+        .error-message {
+            background: white;
+            border: 2px solid #000;
+            border-radius: 10px;
+            padding: 20px;
+            color: #000;
+        }
+        /* Tab Styles */
+        .tabs-container {
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+        .tabs {
+            display: flex;
+            background: white;
+            border-radius: 10px 10px 0 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 0;
+            margin: 0;
+            overflow-x: auto;
+        }
+        .tab-button {
+            flex: 1;
+            padding: 15px 25px;
+            background: white;
+            border: 2px solid #000;
+            border-right: 1px solid #ddd;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #000;
+            transition: all 0.3s;
+            white-space: nowrap;
+            min-width: 150px;
+        }
+        .tab-button:last-child {
+            border-right: none;
+        }
+        .tab-button:hover {
+            background: #f0f0f0;
+            color: #000;
+        }
+        .tab-button.active {
+            background: white;
+            color: #000;
+            border-bottom: none;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="automation-page">
+    <nav class="navbar">
+        <div class="nav-brand">Order Management</div>
+        <div class="nav-right">
+            <span id="userInfo"></span>
+            <button onclick="logout()" class="btn-logout">Logout</button>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html">📊 Dashboard</a></li>
+                <li><a href="orders.html">📦 Orders</a></li>
+                <li><a href="products.html">🛍️ Products</a></li>
+                <li><a href="billing.html">💰 Billing</a></li>
+                <li><a href="bills.html">📄 Bills History</a></li>
+                <li><a href="dispatched.html">📤 Dispatched</a></li>
+                <li><a href="employees.html">👥 Employee Management</a></li>
+                <li><a href="automation.html" class="active">⚡ Automation</a></li>
+                <li><a href="return-scan.html">📷 Return Scan</a></li>
+                <li><a href="backup.html">💾 Backup & Restore</a></li>
+                <li><a href="sellers.html" id="sellersLink" style="display: none;">👥 Sellers</a></li>
+            </ul>
+        </aside>
+
+        <div class="container">
+            <div class="page-header">
+                <h1 style="color: #ff8c00;">Bulk Status Update - Automation</h1>
+            </div>
+
+            <div class="tabs-container">
+                <!-- Tabs Navigation -->
+                <div class="tabs">
+                    <button class="tab-button active" onclick="openTab(event, 'statusUpdate')">📊 Status Update</button>
+                    <button class="tab-button" onclick="openTab(event, 'trackingUpload')">📦 Tracking IDs Upload</button>
+                    <button class="tab-button" onclick="openTab(event, 'bulkReturnScan')">🔄 Bulk Return Scan</button>
+                    <button class="tab-button" onclick="openTab(event, 'instructions')">📋 Instructions</button>
+                </div>
+
+                <!-- Tab 1: Status Update -->
+                <div id="statusUpdate" class="tab-content active">
+                    <h2>Update Orders Status in Bulk</h2>
+                    <div class="header-actions" style="margin-bottom: 20px;">
+                        <button onclick="downloadTrackingTemplate()" class="btn-secondary">📥 Download Tracking IDs Template</button>
+                        <button onclick="downloadOrderNumberTemplate()" class="btn-secondary">📥 Download Order Numbers Template</button>
+                    </div>
+                <form id="automationForm">
+                    <div class="form-group">
+                        <label>Select Seller *</label>
+                        <select id="sellerSelect" required>
+                            <option value="">Select Seller</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Update By *</label>
+                        <select id="updateBy" required onchange="toggleInputMethod()">
+                            <option value="">Select Method</option>
+                            <option value="tracking_id">Tracking IDs</option>
+                            <option value="order_number">Order Reference Numbers</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>New Status *</label>
+                        <select id="newStatus" required>
+                            <option value="">Select Status</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="return">Return</option>
+                            <option value="pending">Pending</option>
+                            <option value="cancel">Cancel</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label id="inputLabel">Enter IDs/Numbers (one per line or comma separated) *</label>
+                        <textarea id="idsInput" rows="10" placeholder="Enter tracking IDs or order numbers, one per line or separated by commas&#10;Example:&#10;TRK123456&#10;TRK789012&#10;OR&#10;ORD001,ORD002,ORD003" required></textarea>
+                        <small>You can paste multiple IDs/numbers, one per line or separated by commas</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Or Upload File (Optional)</label>
+                        <input type="file" id="fileInput" accept=".txt,.csv,.xlsx,.xls">
+                        <small>Upload a text file (.txt, .csv) or Excel file (.xlsx, .xls) with one ID/number per line</small>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Update Status</button>
+                        <button type="button" onclick="clearForm()" class="btn-secondary">Clear</button>
+                    </div>
+                </form>
+
+                    <div id="resultMessage" style="margin-top: 20px; display: none;"></div>
+                </div>
+
+                <!-- Tab 2: Tracking IDs Upload -->
+                <div id="trackingUpload" class="tab-content">
+                    <h2>📦 Bulk Upload Tracking IDs</h2>
+                <form id="trackingUploadForm">
+                    <div class="form-group">
+                        <label>Select Seller *</label>
+                        <select id="trackingSellerSelect" required>
+                            <option value="">Select Seller</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Upload File (Excel with Order Number & Tracking ID) *</label>
+                        <input type="file" id="trackingFileInput" accept=".xlsx,.xls" required>
+                        <small>Upload Excel file with columns: Order Number, Tracking ID</small>
+                        <br><br>
+                        <button type="button" onclick="downloadTrackingUploadTemplate()" class="btn-secondary">📥 Download Template</button>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Upload Tracking IDs</button>
+                        <button type="button" onclick="clearTrackingForm()" class="btn-secondary">Clear</button>
+                    </div>
+                </form>
+
+                    <div id="trackingResultMessage" style="margin-top: 20px; display: none;"></div>
+                </div>
+
+                <!-- Tab 3: Bulk Return Scan -->
+                <div id="bulkReturnScan" class="tab-content">
+                    <h2>🔄 Bulk Return Scan</h2>
+                    <p style="margin-bottom: 20px; color: #666;">Enter or paste multiple tracking IDs to mark orders as return. You can input IDs one per line or comma separated, or upload a file.</p>
+                <form id="bulkReturnForm">
+                    <div class="form-group">
+                        <label>Enter Tracking IDs (one per line or comma separated) *</label>
+                        <textarea id="bulkReturnInput" rows="10" placeholder="Enter tracking IDs, one per line or separated by commas&#10;Example:&#10;TRK123456&#10;TRK789012&#10;OR&#10;TRK123456,TRK789012,TRK345678" required></textarea>
+                        <small>You can paste multiple tracking IDs, one per line or separated by commas</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Or Upload File (Optional)</label>
+                        <input type="file" id="bulkReturnFileInput" accept=".txt,.csv,.xlsx,.xls">
+                        <small>Upload a text file (.txt, .csv) or Excel file (.xlsx, .xls) with one tracking ID per line</small>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Mark as Return</button>
+                        <button type="button" onclick="clearBulkReturnForm()" class="btn-secondary">Clear</button>
+                    </div>
+                </form>
+
+                    <div id="bulkReturnResultMessage" style="margin-top: 20px; display: none;"></div>
+                </div>
+
+                <!-- Tab 4: Instructions -->
+                <div id="instructions" class="tab-content">
+                    <h2>📋 Instructions</h2>
+                <div style="text-align: left; line-height: 2;">
+                    <h4 style="color: #000; margin-top: 15px;">Status Update:</h4>
+                    <ul>
+                        <li>Select the seller whose orders you want to update</li>
+                        <li>Choose whether to update by Tracking IDs or Order Reference Numbers</li>
+                        <li>Select the new status (Delivered, Return, Pending, or Cancel)</li>
+                        <li>Enter the IDs/numbers either by typing or uploading a file</li>
+                        <li>Click "Update Status" to process the bulk update</li>
+                    </ul>
+                    
+                    <h4 style="color: #000; margin-top: 20px;">Tracking IDs Upload:</h4>
+                    <ul>
+                        <li>Select the seller</li>
+                        <li>Download the template Excel file</li>
+                        <li>Fill in Order Number and Tracking ID columns</li>
+                        <li>Upload the file to update tracking IDs for those orders</li>
+                    </ul>
+                    
+                    <h4 style="color: #000; margin-top: 20px;">Bulk Return Scan:</h4>
+                    <ul>
+                        <li>Enter or paste multiple tracking IDs (one per line or comma separated)</li>
+                        <li>Or upload a file with tracking IDs</li>
+                        <li>Click "Mark as Return" to update all matching orders to return status</li>
+                        <li>Results will show how many orders were updated</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching function
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            
+            // Hide all tab content
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            
+            // Remove active class from all tab buttons
+            tablinks = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            
+            // Show the selected tab and mark button as active
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+    </script>
+
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    <script src="config.js"></script>
+    <script src="auth.js"></script>
+    <script src="mobile-menu.js"></script>
+    <script src="automation.js"></script>
+    <script>
+        // Show sellers link for admin
+        window.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const sellersLink = document.getElementById('sellersLink');
+            if (sellersLink && user.role === 'admin') {
+                sellersLink.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
+
