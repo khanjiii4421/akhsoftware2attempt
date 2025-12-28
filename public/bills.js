@@ -8,7 +8,8 @@ async function loadSellers() {
         sellerFilter.innerHTML = '<option value="">All Sellers</option>';
 
         if (user.role === 'admin') {
-            const response = await fetch('/api/sellers', {
+            const apiBase = window.API_BASE_URL ? `${window.API_BASE_URL}/api` : 'http://localhost:3000/api';
+            const response = await fetch(`${apiBase}/sellers`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -40,7 +41,8 @@ async function loadBills() {
         const sellerFilter = document.getElementById('sellerFilter');
         const sellerName = sellerFilter ? sellerFilter.value : '';
         
-        let url = '/api/bills';
+        const apiBase = window.API_BASE_URL ? `${window.API_BASE_URL}/api` : 'http://localhost:3000/api';
+        let url = `${apiBase}/bills`;
         if (sellerName) {
             url += `?seller_name=${encodeURIComponent(sellerName)}`;
         }
@@ -174,7 +176,8 @@ async function searchInLoadedBills(trackingId, orderNumber, sellerName) {
         
         if (bills.length === 0) {
             const token = localStorage.getItem('token');
-            let url = '/api/bills';
+            const apiBase = window.API_BASE_URL ? `${window.API_BASE_URL}/api` : 'http://localhost:3000/api';
+            let url = `${apiBase}/bills`;
             if (sellerName) {
                 url += `?seller_name=${encodeURIComponent(sellerName)}`;
             }
@@ -317,7 +320,8 @@ function isAdmin() {
 async function viewBillDetail(billNumber) {
     try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`/api/bills/${billNumber}`, {
+        const apiBase = window.API_BASE_URL ? `${window.API_BASE_URL}/api` : 'http://localhost:3000/api';
+        const response = await fetch(`${apiBase}/bills/${billNumber}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -431,7 +435,8 @@ async function deleteBill(billId) {
 
     try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`${API_BASE}/bills/${billId}`, {
+        const apiBase = window.API_BASE_URL ? `${window.API_BASE_URL}/api` : 'http://localhost:3000/api';
+        const response = await fetch(`${apiBase}/bills/${billId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -503,7 +508,8 @@ async function loadMatchingSellers() {
         sellerFilter.innerHTML = '<option value="">Select Seller</option>';
 
         if (user.role === 'admin') {
-            const response = await fetch('/api/sellers', {
+            const apiBase = window.API_BASE_URL ? `${window.API_BASE_URL}/api` : 'http://localhost:3000/api';
+            const response = await fetch(`${apiBase}/sellers`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -665,7 +671,8 @@ async function matchBills() {
     try {
         // Load all bills for the seller
         const token = localStorage.getItem('token');
-        const response = await fetch(`/api/bills?seller_name=${encodeURIComponent(sellerName)}`, {
+        const apiBase = window.API_BASE_URL ? `${window.API_BASE_URL}/api` : 'http://localhost:3000/api';
+        const response = await fetch(`${apiBase}/bills?seller_name=${encodeURIComponent(sellerName)}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

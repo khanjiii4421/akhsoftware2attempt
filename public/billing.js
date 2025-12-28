@@ -22,7 +22,8 @@ async function loadSellers() {
         sellerSelect.disabled = true;
 
         if (user.role === 'admin') {
-            const response = await fetch('/api/sellers', {
+            const apiBase = window.API_BASE_URL ? `${window.API_BASE_URL}/api` : 'http://localhost:3000/api';
+            const response = await fetch(`${apiBase}/sellers`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -121,7 +122,8 @@ async function loadBill() {
             throw new Error('Not authenticated');
         }
 
-        const response = await fetch('/api/billing/generate-bill', {
+        const apiBase = window.API_BASE_URL ? `${window.API_BASE_URL}/api` : 'http://localhost:3000/api';
+        const response = await fetch(`${apiBase}/billing/generate-bill`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -573,7 +575,8 @@ async function markAsPaid() {
         const token = localStorage.getItem('token');
         const orderIds = currentBillData.orders.map(o => o.id);
         
-        const response = await fetch('/api/billing/mark-paid', {
+        const apiBase = window.API_BASE_URL ? `${window.API_BASE_URL}/api` : 'http://localhost:3000/api';
+        const response = await fetch(`${apiBase}/billing/mark-paid`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
