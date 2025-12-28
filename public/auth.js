@@ -1,23 +1,14 @@
 // Authentication and Token Management
-// API_BASE: Auto-detect based on environment
-// In production (Netlify), this will be your Vercel backend URL
-// In development, it will use localhost
-const API_BASE = (() => {
-  // Check if we have a custom API URL set (for Netlify deployment)
-  if (window.API_BASE_URL) {
-    return window.API_BASE_URL;
-  }
-  
-  // Check if we're in production (Netlify)
-  if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-    // This will be set via Netlify environment variable
-    // Default to same origin if not set (for same-domain deployment)
-    return '/api';
-  }
-  
-  // Development: use localhost
-  return 'http://localhost:3000/api';
-})();
+// API_BASE_URL: Set by config.js (loaded before this file)
+// In production (Netlify), this will be your Vercel backend URL (e.g., https://khandevhub.vercel.app)
+// In development, it will use localhost:3000
+const API_BASE_URL = window.API_BASE_URL || 'https://khandevhub.vercel.app';
+
+// API_BASE: Add /api suffix for API calls
+const API_BASE = API_BASE_URL.endsWith('/api') ? API_BASE_URL : `${API_BASE_URL}/api`;
+
+console.log('🔗 API Base URL:', API_BASE_URL);
+console.log('🔗 API Endpoint:', API_BASE);
 
 // Check authentication on page load
 window.addEventListener('DOMContentLoaded', () => {
@@ -53,7 +44,7 @@ if (document.getElementById('loginForm')) {
         const errorDiv = document.getElementById('loginError');
         
         try {
-            const response = await fetch(`${API_BASE}/login`, {
+            const response = await fetch(`${API_BASE_URL}/api/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })

@@ -76,28 +76,80 @@ if %errorlevel% equ 0 (
 echo.
 
 echo Step 6: Checking GitHub Remote...
-git remote -v >nul 2>&1
+git remote get-url origin >nul 2>&1
 if %errorlevel% equ 0 (
     echo ✅ GitHub remote configured
+    git remote get-url origin
 ) else (
     echo ⚠️  GitHub remote not configured
+    echo 📦 Adding GitHub remote: https://github.com/khanjiii4421/akhsoftware2attempt.git
+    git remote add origin https://github.com/khanjiii4421/akhsoftware2attempt.git
+    if %errorlevel% equ 0 (
+        echo ✅ GitHub remote added successfully
+    ) else (
+        echo ❌ Failed to add remote
+        echo.
+        echo Please check and try again manually:
+        echo    git remote add origin https://github.com/khanjiii4421/akhsoftware2attempt.git
+    )
+)
+echo.
+
+echo Step 7: Setting branch to main...
+git branch -M main >nul 2>&1
+echo ✅ Branch set to main
+echo.
+
+echo Step 8: Pushing to GitHub...
+echo ⚠️  This will push your code to: https://github.com/khanjiii4421/akhsoftware2attempt.git
+echo.
+echo Note: Agar username/password mange, to:
+echo    Username: khanjiii4421
+echo    Password: GitHub Personal Access Token (password nahi!)
+echo.
+set /p CONFIRM_PUSH="Continue with push? (Y/N): "
+if /i "%CONFIRM_PUSH%"=="Y" (
     echo.
-    echo Please run PowerShell script for interactive setup:
-    echo    .\auto-deploy.ps1
-    echo.
-    echo Or manually add remote:
-    echo    git remote add origin https://github.com/USERNAME/REPO_NAME.git
+    echo Pushing to GitHub...
+    git push -u origin main
+    if %errorlevel% equ 0 (
+        echo.
+        echo ========================================
+        echo ✅ SUCCESS! Code pushed to GitHub!
+        echo ========================================
+        echo.
+        echo Repository: https://github.com/khanjiii4421/akhsoftware2attempt
+        echo.
+        echo Next Steps:
+        echo 1. Deploy on Vercel (see VERCEL_NETLIFY_DEPLOYMENT.md)
+        echo 2. Deploy on Netlify (see VERCEL_NETLIFY_DEPLOYMENT.md)
+    ) else (
+        echo.
+        echo ❌ Push failed! Possible reasons:
+        echo    - GitHub authentication required
+        echo    - Wrong username/password
+        echo    - Personal Access Token nahi use kiya
+        echo    - Network issue
+        echo.
+        echo Solutions:
+        echo 1. GitHub Personal Access Token generate karein:
+        echo    - Go to: https://github.com/settings/tokens
+        echo    - Generate new token (classic)
+        echo    - Select 'repo' scope
+        echo    - Use token as password
+        echo.
+        echo 2. Baad mein push karne ke liye:
+        echo    git push -u origin main
+    )
+) else (
+    echo ⚠️  Push skipped. Aap baad mein push kar sakte hain:
+    echo    git push -u origin main
 )
 echo.
 
 echo ========================================
-echo ✅ LOCAL SETUP COMPLETE!
+echo ✅ SETUP COMPLETE!
 echo ========================================
-echo.
-echo Next Steps:
-echo 1. Run PowerShell script for full automation: .\auto-deploy.ps1
-echo 2. Or manually push: git push -u origin main
-echo 3. Deploy on Vercel and Netlify (see AUTO_DEPLOY_INSTRUCTIONS.md)
 echo.
 pause
 

@@ -6,22 +6,78 @@ Write-Host "🚀 AUTOMATED DEPLOYMENT SETUP" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
+# Step 0: Setup Git PATH
+Write-Host "Step 0: Setting up Git PATH..." -ForegroundColor Yellow
+$gitPaths = @(
+    "C:\Program Files\Git\bin\git.exe",
+    "C:\Program Files (x86)\Git\bin\git.exe",
+    "C:\Program Files\Git\cmd\git.exe",
+    "C:\Program Files (x86)\Git\cmd\git.exe"
+)
+
+$gitFound = $false
+$gitPath = $null
+
+foreach ($path in $gitPaths) {
+    if (Test-Path $path) {
+        $gitDirectory = Split-Path $path
+        if ($env:PATH -notlike "*$gitDirectory*") {
+            $env:PATH = "$gitDirectory;$env:PATH"
+            Write-Host "✅ Git added to PATH: $gitDirectory" -ForegroundColor Green
+        } else {
+            Write-Host "✅ Git already in PATH" -ForegroundColor Green
+        }
+        $gitFound = $true
+        $gitPath = $path
+        break
+    }
+}
+
+# Also try to find Git using where.exe
+if (-not $gitFound) {
+    try {
+        $whereGit = where.exe git 2>&1
+        if ($whereGit -and $whereGit -notmatch "could not be found") {
+            $gitFound = $true
+            Write-Host "✅ Git found via PATH: $whereGit" -ForegroundColor Green
+        }
+    } catch {
+        # Ignore error, will check in next step
+    }
+}
+
+Write-Host ""
+
 # Step 1: Check Git Installation
 Write-Host "Step 1: Checking Git Installation..." -ForegroundColor Yellow
 try {
     $gitVersion = git --version 2>&1
-    Write-Host "✅ Git installed: $gitVersion" -ForegroundColor Green
-    $gitInstalled = $true
+    if ($LASTEXITCODE -eq 0 -and $gitVersion -notmatch "error" -and $gitVersion -notmatch "not found") {
+        Write-Host "✅ Git installed: $gitVersion" -ForegroundColor Green
+        $gitInstalled = $true
+    } else {
+        throw "Git command failed"
+    }
 } catch {
-    Write-Host "❌ Git not installed!" -ForegroundColor Red
+    Write-Host "❌ Git not found in PATH!" -ForegroundColor Red
     Write-Host ""
-    Write-Host "Please install Git first:" -ForegroundColor Yellow
-    Write-Host "1. Download from: https://git-scm.com/download/win" -ForegroundColor Cyan
-    Write-Host "2. Install Git" -ForegroundColor Cyan
-    Write-Host "3. Restart PowerShell" -ForegroundColor Cyan
-    Write-Host "4. Run this script again" -ForegroundColor Cyan
-    $gitInstalled = $false
-    exit 1
+    if ($gitPath) {
+        Write-Host "⚠️  Git found at: $gitPath" -ForegroundColor Yellow
+        Write-Host "   But PATH setup failed. Trying to use directly..." -ForegroundColor Yellow
+        # Try using full path
+        $gitExe = $gitPath
+    } else {
+        Write-Host "Please install Git first:" -ForegroundColor Yellow
+        Write-Host "1. Download from: https://git-scm.com/download/win" -ForegroundColor Cyan
+        Write-Host "2. Install Git (make sure to select 'Add to PATH' option)" -ForegroundColor Cyan
+        Write-Host "3. Close and reopen PowerShell" -ForegroundColor Cyan
+        Write-Host "4. Run this script again" -ForegroundColor Cyan
+        Write-Host ""
+        Write-Host "OR use batch file instead: .\auto-deploy.bat" -ForegroundColor Cyan
+        $gitInstalled = $false
+        Read-Host "Press Enter to exit"
+        exit 1
+    }
 }
 
 Write-Host ""

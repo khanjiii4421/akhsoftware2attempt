@@ -65,11 +65,18 @@ SUPABASE_SERVICE_ROLE_KEY=[Your Supabase service_role key]
 
 ## 🎨 Step 3: Netlify Frontend Deploy (1 minute)
 
-### 3.1 Netlify Setup:
+### ⚠️ Network Error Aaye To?
+Agar Netlify upload par "Network error" aaye, to:
+- **Best:** GitHub integration use karein (drag-and-drop se behtar) ✅
+- **Alternative:** `netlify-deploy.bat` script use karein (CLI method)
+- **Help:** `NETLIFY_NETWORK_ERROR_FIX.md` dekhein (complete solutions)
+
+### 3.1 Netlify Setup (GitHub Integration - Recommended):
 1. [netlify.com](https://netlify.com) par sign up (GitHub se)
 2. **"Add new site"** → **"Import an existing project"**
-3. GitHub repository select karein
-4. **"Connect"** click karein
+3. **"Deploy with GitHub"** click karein
+4. GitHub repository select karein: `khanjiii4421/akhsoftware2attempt`
+5. **"Connect"** click karein
 
 ### 3.2 Build Settings:
 - **Base directory:** (blank)

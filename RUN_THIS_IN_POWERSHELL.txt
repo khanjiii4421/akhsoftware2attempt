@@ -1,0 +1,36 @@
+========================================
+🔧 QUICK GIT FIX - PowerShell Commands
+========================================
+
+YEH COMMANDS COPY KAREIN AUR POWERSHELL MEIN PASTE KAREIN:
+
+-------------------------------------------------------------
+STEP 1: Git PATH Add Karen
+-------------------------------------------------------------
+$env:PATH += ";C:\Program Files\Git\bin"
+
+-------------------------------------------------------------
+STEP 2: Verify Karen (Git Kaam Kar Raha Hai Ya Nahi)
+-------------------------------------------------------------
+git --version
+
+Agar version dikhaye, to ✅ SUCCESS! Ab git commands kaam karenge.
+
+-------------------------------------------------------------
+STEP 3: Ab Apne Git Commands Run Karen
+-------------------------------------------------------------
+git add .
+git commit -m "Ready for deployment"
+git push origin main
+
+-------------------------------------------------------------
+
+⚠️ NOTE: Yeh fix sirf current PowerShell window ke liye hai.
+         Window close karne ke baad dobara run karna hoga.
+
+Permanent fix ke liye:
+  - .\fix-git-path.ps1 run karein (script banaya hai)
+  - Ya .\auto-deploy.bat use karein (batch file - easier)
+
+========================================
+
