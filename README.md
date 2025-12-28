@@ -1,3 +1,4 @@
+ HEAD
 # Order Management System
 
 A comprehensive web application for managing orders with admin and seller functionality, built with HTML, CSS, and JavaScript.
@@ -233,3 +234,7 @@ This application is configured for:
 
 Before running the application, ensure your Supabase database has all required tables. Run the SQL script from `supabase_schema.sql` in your Supabase SQL Editor.
 
+=======
+# akhsoftware2attempt
+2 second attemped
+>>>>>>> 8f1ad40ad478a818223418d36920ac12b7502d91
