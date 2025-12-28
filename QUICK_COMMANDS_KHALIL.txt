@@ -1,0 +1,39 @@
+========================================
+🚀 QUICK COMMANDS FOR KHALIL
+========================================
+
+Apne Command Prompt mein ye commands run karein:
+
+REM Step 1: Git User Setup
+git config --global user.name "khalil"
+git config --global user.email "khanjiii4421@gmail.com"
+
+REM Step 2: Verify Setup
+git config --global user.name
+git config --global user.email
+
+REM Step 3: Commit
+git commit -m "Ready for Vercel + Netlify deployment"
+
+REM Step 4: Set Branch
+git branch -M main
+
+REM Step 5: Check Remote (agar nahi hai to add karein)
+git remote -v
+
+REM Step 6: Add Remote (agar nahi hai)
+git remote add origin https://github.com/YOUR_USERNAME/REPO_NAME.git
+
+REM Step 7: Push to GitHub
+git push -u origin main
+
+========================================
+📝 OR SIMPLY RUN:
+========================================
+
+setup-and-push.bat
+
+Ye script sab kuch automatically karega!
+
+========================================
+

@@ -30,8 +30,19 @@ if exist ".git" (
 )
 echo.
 
-echo Step 3: Generating JWT_SECRET...
-echo (This will be shown in PowerShell version)
+echo Step 3: Configuring Git User...
+git config user.name >nul 2>&1
+if %errorlevel% neq 0 (
+    echo ⚠️  Git user not configured
+    echo Please set Git user:
+    echo    git config --global user.name "Your Name"
+    echo    git config --global user.email "your@email.com"
+    echo.
+    echo Or run PowerShell script for interactive setup: .\auto-deploy.ps1
+    echo.
+) else (
+    echo ✅ Git user configured
+)
 echo.
 
 echo Step 4: Adding files to Git...
@@ -41,7 +52,17 @@ echo.
 
 echo Step 5: Creating commit...
 git commit -m "Ready for Vercel + Netlify deployment"
-echo ✅ Commit created
+if %errorlevel% equ 0 (
+    echo ✅ Commit created
+) else (
+    echo ❌ Commit failed!
+    echo.
+    echo Please configure Git user first:
+    echo    git config --global user.name "Your Name"
+    echo    git config --global user.email "your@email.com"
+    echo.
+    echo Then run: git commit -m "Ready for Vercel + Netlify deployment"
+)
 echo.
 
 echo Step 6: Checking GitHub Remote...

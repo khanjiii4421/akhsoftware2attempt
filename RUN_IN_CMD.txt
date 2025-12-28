@@ -1,0 +1,23 @@
+========================================
+🚀 COMMAND PROMPT MEIN RUN KAREIN
+========================================
+
+Step 1: Command Prompt Open Karen
+   - Windows Key + R
+   - Type: cmd
+   - Press Enter
+
+Step 2: Project Folder Mein Jayen
+   cd "C:\Users\ThinkPad\Desktop\Adnan software kamalia"
+
+Step 3: Script Run Karen
+   complete-setup-khalil.bat
+
+========================================
+YA DIRECTLY YE COMMAND:
+========================================
+
+cd "C:\Users\ThinkPad\Desktop\Adnan software kamalia" && complete-setup-khalil.bat
+
+========================================
+

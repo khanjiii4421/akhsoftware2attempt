@@ -61,13 +61,42 @@ Write-Host "✅ Generated JWT_SECRET: $jwtSecret" -ForegroundColor Green
 Write-Host "   (Save this for Vercel environment variables)" -ForegroundColor Cyan
 Write-Host ""
 
-# Step 5: Add all files
-Write-Host "Step 5: Adding files to Git..." -ForegroundColor Yellow
+# Step 5: Configure Git User (if not set)
+Write-Host "Step 5: Configuring Git User..." -ForegroundColor Yellow
+$gitUser = git config --global user.name 2>&1
+$gitEmail = git config --global user.email 2>&1
+
+if (-not $gitUser -or $gitUser -match "error" -or $gitUser -eq "") {
+    Write-Host "⚠️  Git user name not set" -ForegroundColor Yellow
+    $userName = Read-Host "Enter your name (for Git commits)"
+    if ($userName) {
+        git config --global user.name $userName
+        Write-Host "✅ Git user name set: $userName" -ForegroundColor Green
+    }
+} else {
+    Write-Host "✅ Git user name: $gitUser" -ForegroundColor Green
+}
+
+if (-not $gitEmail -or $gitEmail -match "error" -or $gitEmail -eq "") {
+    Write-Host "⚠️  Git email not set" -ForegroundColor Yellow
+    $userEmail = Read-Host "Enter your email (for Git commits)"
+    if ($userEmail) {
+        git config --global user.email $userEmail
+        Write-Host "✅ Git email set: $userEmail" -ForegroundColor Green
+    }
+} else {
+    Write-Host "✅ Git email: $gitEmail" -ForegroundColor Green
+}
+
+Write-Host ""
+
+# Step 6: Add all files
+Write-Host "Step 6: Adding files to Git..." -ForegroundColor Yellow
 git add .
 Write-Host "✅ Files added" -ForegroundColor Green
 Write-Host ""
 
-# Step 6: Check for remote
+# Step 7: Check for remote
 Write-Host "Step 6: Checking GitHub Remote..." -ForegroundColor Yellow
 $remote = git remote -v 2>&1
 if ($remote -match "origin") {
@@ -91,15 +120,21 @@ if ($remote -match "origin") {
 
 Write-Host ""
 
-# Step 7: Commit
-Write-Host "Step 7: Creating commit..." -ForegroundColor Yellow
+# Step 8: Commit
+Write-Host "Step 8: Creating commit..." -ForegroundColor Yellow
 $commitMessage = "Ready for Vercel + Netlify deployment"
 git commit -m $commitMessage
-Write-Host "✅ Commit created" -ForegroundColor Green
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "✅ Commit created" -ForegroundColor Green
+} else {
+    Write-Host "❌ Commit failed. Please check Git configuration." -ForegroundColor Red
+    Write-Host "   Run: git config --global user.name 'Your Name'" -ForegroundColor Yellow
+    Write-Host "   Run: git config --global user.email 'your@email.com'" -ForegroundColor Yellow
+}
 Write-Host ""
 
-# Step 8: Push to GitHub
-Write-Host "Step 8: Pushing to GitHub..." -ForegroundColor Yellow
+# Step 9: Push to GitHub
+Write-Host "Step 9: Pushing to GitHub..." -ForegroundColor Yellow
 Write-Host "⚠️  This will push to GitHub. Continue? (Y/N)" -ForegroundColor Yellow
 $confirm = Read-Host
 if ($confirm -eq "Y" -or $confirm -eq "y") {
@@ -117,7 +152,7 @@ Write-Host "✅ LOCAL SETUP COMPLETE!" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
-# Step 9: Deployment Instructions
+# Step 10: Deployment Instructions
 Write-Host "Next Steps for Deployment:" -ForegroundColor Yellow
 Write-Host ""
 Write-Host "1. VERCEL (Backend):" -ForegroundColor Cyan
