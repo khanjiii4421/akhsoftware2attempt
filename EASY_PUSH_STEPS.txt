@@ -1,0 +1,37 @@
+═══════════════════════════════════════════════════════════
+🚀 GITHUB PUSH - SIMPLE STEPS
+═══════════════════════════════════════════════════════════
+
+STEP 1: GitHub Token Banayein (Pehli Baar Ke Liye)
+────────────────────────────────────────────────────
+1. Browser mein open karein: https://github.com/settings/tokens
+2. "Generate new token (classic)" click karein
+3. Settings:
+   - Note: "Push to akhsoftware2attempt"
+   - Expiration: 90 days
+   - Scopes: ✅ "repo" check karein
+4. "Generate token" click karein
+5. Token copy karke safe jagah save kar lein
+
+
+STEP 2: PowerShell Mein Push Karein
+────────────────────────────────────
+Command run karein:
+
+   .\PUSH_TO_GITHUB.ps1
+
+Ya manually:
+
+   git push -u origin main
+
+
+STEP 3: Jab Username/Password Mange
+────────────────────────────────────
+   Username: khanjiii4421
+   Password: Apna Personal Access Token (password nahi!)
+
+
+═══════════════════════════════════════════════════════════
+✅ Repository URL: https://github.com/khanjiii4421/akhsoftware2attempt
+═══════════════════════════════════════════════════════════
+
