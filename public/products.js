@@ -255,6 +255,11 @@ async function processBulkUpload() {
         return;
     }
     
+    // Disable upload button to prevent double-clicking
+    const uploadBtn = event.target;
+    uploadBtn.disabled = true;
+    uploadBtn.textContent = 'Processing...';
+    
     try {
         // Load XLSX if not already loaded
         if (typeof XLSX === 'undefined') {
@@ -272,31 +277,47 @@ async function processBulkUpload() {
         const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
         const jsonData = XLSX.utils.sheet_to_json(firstSheet);
         
-        // Convert Excel data to product format
-        const products = jsonData.map(row => ({
-            seller_name: row['Seller Name'] || row['seller_name'] || '',
-            product_name: row['Product Name'] || row['product_name'] || '',
-            price: parseFloat(row['Price'] || row['price'] || 0)
-        }));
+        // Convert Excel data to product format with validation
+        const products = jsonData
+            .map(row => ({
+                seller_name: (row['Seller Name'] || row['seller_name'] || '').toString().trim(),
+                product_name: (row['Product Name'] || row['product_name'] || '').toString().trim(),
+                price: parseFloat(row['Price'] || row['price'] || 0)
+            }))
+            .filter(product => product.seller_name && product.product_name && product.price > 0);
         
         if (products.length === 0) {
-            alert('No products found in file');
+            alert('No valid products found in file. Please ensure the file has columns: Seller Name, Product Name, and Price');
+            uploadBtn.disabled = false;
+            uploadBtn.textContent = 'Upload';
             return;
         }
+        
+        console.log(`Uploading ${products.length} products...`);
         
         const response = await fetchWithAuth(`${API_BASE}/products/bulk`, {
             method: 'POST',
             body: JSON.stringify({ products })
         });
         
-        if (response) {
+        if (response && response.ok) {
             const data = await response.json();
-            alert(data.message || 'Bulk upload completed');
+            alert(data.message || `Successfully uploaded ${data.count || products.length} products!`);
             closeBulkUploadModal();
-            loadProducts();
+            await loadProducts(); // Reload products to show new data
+        } else if (response) {
+            const data = await response.json();
+            alert(`Error: ${data.error || 'Failed to upload products'}\n${data.details || ''}`);
+        } else {
+            alert('Network error. Please check your connection and try again.');
         }
     } catch (error) {
+        console.error('Error processing bulk upload:', error);
         alert('Error reading file: ' + error.message);
+    } finally {
+        // Re-enable button
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = 'Upload';
     }
 }
 

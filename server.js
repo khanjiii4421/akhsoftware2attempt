@@ -422,25 +422,64 @@ app.post('/api/products/bulk', authenticateToken, async (req, res) => {
 
   const { products } = req.body;
   
-  try {
-    const { data, error } = await supabase
-      .from('products')
-      .upsert(products.map(product => ({
-        seller_name: (product.seller_name || '').toLowerCase(),
-        product_name: (product.product_name || '').toLowerCase(),
-        price: product.price,
-        created_at: new Date().toISOString(), // Supabase handles created_at on insert, but explicit for upsert
-        updated_at: new Date().toISOString() // Supabase handles updated_at on update
-      })), { onConflict: 'seller_name,product_name' });
+  // Validate products array
+  if (!products || !Array.isArray(products) || products.length === 0) {
+    return res.status(400).json({ error: 'No products provided' });
+  }
 
-    if (error) {
-      console.error('Supabase error bulk uploading products:', error);
-      return res.status(500).json({ error: 'Failed to bulk upload products' });
+  try {
+    // Process products in batches to avoid overwhelming the database
+    const BATCH_SIZE = 100;
+    let totalInserted = 0;
+    
+    for (let i = 0; i < products.length; i += BATCH_SIZE) {
+      const batch = products.slice(i, i + BATCH_SIZE);
+      
+      // Validate and format each product
+      const formattedProducts = batch
+        .filter(product => product.seller_name && product.product_name && product.price)
+        .map(product => ({
+          seller_name: (product.seller_name || '').toLowerCase().trim(),
+          product_name: (product.product_name || '').toLowerCase().trim(),
+          price: parseFloat(product.price)
+        }));
+
+      if (formattedProducts.length === 0) {
+        continue;
+      }
+
+      // Insert products (use insert instead of upsert to avoid timestamp issues)
+      const { data, error } = await supabase
+        .from('products')
+        .upsert(formattedProducts, { 
+          onConflict: 'seller_name,product_name',
+          ignoreDuplicates: false 
+        })
+        .select();
+
+      if (error) {
+        console.error('Supabase error bulk uploading products:', error);
+        return res.status(500).json({ 
+          error: 'Failed to bulk upload products', 
+          details: error.message,
+          inserted: totalInserted 
+        });
+      }
+      
+      totalInserted += formattedProducts.length;
+      console.log(`Batch ${Math.floor(i / BATCH_SIZE) + 1}: Inserted ${formattedProducts.length} products`);
     }
-    res.json({ message: 'Products uploaded successfully' });
+    
+    res.json({ 
+      message: `Successfully uploaded ${totalInserted} products`,
+      count: totalInserted 
+    });
   } catch (err) {
     console.error('Error bulk uploading products:', err);
-    return res.status(500).json({ error: 'Failed to bulk upload products' });
+    return res.status(500).json({ 
+      error: 'Failed to bulk upload products', 
+      details: err.message 
+    });
   }
 });
 
