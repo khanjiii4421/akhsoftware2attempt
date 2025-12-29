@@ -15,7 +15,8 @@ async function loadSellers() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     
     if (user.role === 'admin') {
-        const response = await fetchWithAuth(`${API_BASE}/sellers`);
+        const apiBase = window.API_BASE_URL ? `${window.API_BASE_URL}/api` : (typeof API_BASE !== 'undefined' ? API_BASE : 'http://localhost:3000/api');
+        const response = await fetchWithAuth(`${apiBase}/sellers`);
         if (response) {
             const sellers = await response.json();
             sellersList = sellers;
@@ -46,7 +47,8 @@ async function loadSellersForTracking() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     
     if (user.role === 'admin') {
-        const response = await fetchWithAuth(`${API_BASE}/sellers`);
+        const apiBase = window.API_BASE_URL ? `${window.API_BASE_URL}/api` : (typeof API_BASE !== 'undefined' ? API_BASE : 'http://localhost:3000/api');
+        const response = await fetchWithAuth(`${apiBase}/sellers`);
         if (response) {
             const sellers = await response.json();
             
@@ -178,7 +180,8 @@ document.getElementById('automationForm').addEventListener('submit', async (e) =
     }
     
     try {
-        const response = await fetchWithAuth(`${API_BASE}/orders/bulk-update-status`, {
+        const apiBase = window.API_BASE_URL ? `${window.API_BASE_URL}/api` : (typeof API_BASE !== 'undefined' ? API_BASE : 'http://localhost:3000/api');
+        const response = await fetchWithAuth(`${apiBase}/orders/bulk-update-status`, {
             method: 'POST',
             body: JSON.stringify({
                 seller_name: sellerName,
@@ -452,7 +455,8 @@ document.getElementById('trackingUploadForm').addEventListener('submit', async (
         
         console.log('Sending request with:', { seller_name: sellerName, updates_count: updates.length });
         
-        const response = await fetchWithAuth(`${API_BASE}/orders/bulk-update-tracking`, {
+        const apiBase = window.API_BASE_URL ? `${window.API_BASE_URL}/api` : (typeof API_BASE !== 'undefined' ? API_BASE : 'http://localhost:3000/api');
+        const response = await fetchWithAuth(`${apiBase}/orders/bulk-update-tracking`, {
             method: 'POST',
             body: JSON.stringify({
                 seller_name: sellerName,
@@ -608,7 +612,8 @@ if (document.getElementById('bulkReturnForm')) {
         try {
             console.log('Sending bulk return request with:', { tracking_ids_count: trackingIds.length });
             
-            const response = await fetchWithAuth(`${API_BASE}/orders/bulk-scan-return`, {
+            const apiBase = window.API_BASE_URL ? `${window.API_BASE_URL}/api` : (typeof API_BASE !== 'undefined' ? API_BASE : 'http://localhost:3000/api');
+            const response = await fetchWithAuth(`${apiBase}/orders/bulk-scan-return`, {
                 method: 'POST',
                 body: JSON.stringify({
                     tracking_ids: trackingIds
