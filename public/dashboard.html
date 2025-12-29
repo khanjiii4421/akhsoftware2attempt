@@ -24,15 +24,15 @@
             <ul class="sidebar-menu">
                 <li><a href="dashboard.html" class="active">📊 Dashboard</a></li>
                 <li><a href="orders.html">📦 Orders</a></li>
-                <li><a href="products.html">🛍️ Products</a></li>
-                <li><a href="billing.html">💰 Billing</a></li>
-                <li><a href="bills.html">📄 Bills History</a></li>
-                <li><a href="dispatched.html">📤 Dispatched</a></li>
-                <li><a href="employees.html">👥 Employee Management</a></li>
-                <li><a href="automation.html">⚡ Automation</a></li>
-                <li><a href="return-scan.html">📷 Return Scan</a></li>
-                <li><a href="backup.html">💾 Backup & Restore</a></li>
-                <li><a href="sellers.html" id="sellersLink" style="display: none;">👥 Sellers</a></li>
+                <li class="admin-only"><a href="products.html">🛍️ Products</a></li>
+                <li class="admin-only"><a href="billing.html">💰 Billing</a></li>
+                <li class="admin-only"><a href="bills.html">📄 Bills History</a></li>
+                <li class="admin-only"><a href="dispatched.html">📤 Dispatched</a></li>
+                <li class="admin-only"><a href="employees.html">👥 Employee Management</a></li>
+                <li class="admin-only"><a href="automation.html">⚡ Automation</a></li>
+                <li class="admin-only"><a href="return-scan.html">📷 Return Scan</a></li>
+                <li class="admin-only"><a href="backup.html">💾 Backup & Restore</a></li>
+                <li class="admin-only"><a href="sellers.html" id="sellersLink" style="display: none;">👥 Sellers</a></li>
             </ul>
         </aside>
 
@@ -125,12 +125,24 @@
     <script src="mobile-menu.js"></script>
     <script src="dashboard.js"></script>
     <script>
-        // Show sellers link for admin
+        // Show/hide menu items based on role
         window.addEventListener('DOMContentLoaded', () => {
             const user = JSON.parse(localStorage.getItem('user') || '{}');
             const sellersLink = document.getElementById('sellersLink');
-            if (sellersLink && user.role === 'admin') {
-                sellersLink.style.display = 'block';
+            
+            if (user.role === 'admin') {
+                // Show all admin-only items
+                if (sellersLink) {
+                    sellersLink.style.display = 'block';
+                }
+                document.querySelectorAll('.admin-only').forEach(el => {
+                    el.style.display = 'block';
+                });
+            } else {
+                // Hide admin-only items for sellers
+                document.querySelectorAll('.admin-only').forEach(el => {
+                    el.style.display = 'none';
+                });
             }
         });
     </script>

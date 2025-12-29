@@ -114,6 +114,10 @@ function displayOrders(orders) {
     const tbody = document.getElementById('ordersTableBody');
     if (!tbody) return;
     
+    // Check user role
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const isAdmin = user.role === 'admin';
+    
     if (!orders || orders.length === 0) {
         tbody.innerHTML = '<tr><td colspan="16" class="loading">No orders found</td></tr>';
         if (typeof updatePaginationInfo === 'function') {
@@ -178,24 +182,28 @@ function displayOrders(orders) {
                         <td style="white-space: nowrap; text-align: right;">${parseFloat(order.profit || 0).toFixed(2)}</td>
                         <td style="white-space: nowrap;">${escapeHtml(order.tracking_id || '-')}</td>
                     <td>
+                        ${isAdmin ? `
                         <select onchange="updateOrderStatus(${order.id}, this.value, this)" class="status-select" style="padding: 5px; border-radius: 3px; border: 1px solid #ddd; background-color: ${order.status === 'delivered' ? '#28a745' : order.status === 'return' ? '#dc3545' : 'white'}; color: ${order.status === 'delivered' || order.status === 'return' ? 'white' : '#000'};">
                             <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>Pending</option>
                             <option value="delivered" style="background-color: #28a745; color: white;" ${order.status === 'delivered' ? 'selected' : ''}>Delivered</option>
                             <option value="return" style="background-color: #dc3545; color: white;" ${order.status === 'return' ? 'selected' : ''}>Return</option>
                             <option value="cancel" ${order.status === 'cancel' ? 'selected' : ''}>Cancel</option>
                         </select>
+                        ` : `<span class="status-badge status-${order.status}">${order.status.toUpperCase()}</span>`}
                     </td>
                     <td>
+                        ${isAdmin ? `
                         <select onchange="updateOrderPaid(${order.id}, this.value)" style="padding: 5px; border-radius: 3px; border: 1px solid #ddd;">
                             <option value="0" ${order.shipper_paid == 0 ? 'selected' : ''}>Unpaid</option>
                             <option value="1" ${order.shipper_paid == 1 ? 'selected' : ''}>Paid</option>
                         </select>
+                        ` : `<span>${order.shipper_paid == 1 ? 'Paid' : 'Unpaid'}</span>`}
                     </td>
                         <td class="action-buttons" style="white-space: nowrap;">
-                        <button onclick="editOrder(${order.id})" style="padding: 5px 10px; font-size: 11px; border: 1px solid #ddd; background: white; color: #333; border-radius: 3px; cursor: pointer;">Edit</button>
+                        ${isAdmin ? `<button onclick="editOrder(${order.id})" style="padding: 5px 10px; font-size: 11px; border: 1px solid #ddd; background: white; color: #333; border-radius: 3px; cursor: pointer;">Edit</button>` : ''}
                         <button onclick="callCustomer('${phone1Escaped}')" style="padding: 5px 10px; font-size: 11px; border: 1px solid #ddd; background: white; color: #333; border-radius: 3px; cursor: pointer;">Call</button>
                         <button onclick="whatsappMsg('${phone1Escaped}', '${orderNumEscaped}', '${customerEscaped}', '${statusEscaped}')" style="padding: 5px 10px; font-size: 11px; border: 1px solid #ddd; background: white; color: #333; border-radius: 3px; cursor: pointer;">WhatsApp</button>
-                        <button onclick="deleteOrder(${order.id})" class="btn-danger" style="padding: 5px 10px; font-size: 11px; background: #dc3545; color: white; border: 2px solid #dc3545; border-radius: 3px; cursor: pointer; font-weight: 600;">Delete</button>
+                        ${isAdmin ? `<button onclick="deleteOrder(${order.id})" class="btn-danger" style="padding: 5px 10px; font-size: 11px; background: #dc3545; color: white; border: 2px solid #dc3545; border-radius: 3px; cursor: pointer; font-weight: 600;">Delete</button>` : ''}
                     </td>
                 </tr>
             `;

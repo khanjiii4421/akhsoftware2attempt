@@ -23,22 +23,22 @@
             <ul class="sidebar-menu">
                 <li><a href="dashboard.html">📊 Dashboard</a></li>
                 <li><a href="orders.html" class="active">📦 Orders</a></li>
-                <li><a href="products.html">🛍️ Products</a></li>
-                <li><a href="billing.html">💰 Billing</a></li>
-                <li><a href="bills.html">📄 Bills History</a></li>
-                <li><a href="dispatched.html">📤 Dispatched</a></li>
-                <li><a href="employees.html">👥 Employee Management</a></li>
-                <li><a href="automation.html">⚡ Automation</a></li>
-                <li><a href="return-scan.html">📷 Return Scan</a></li>
-                <li><a href="backup.html">💾 Backup & Restore</a></li>
-                <li><a href="sellers.html" id="sellersLink" style="display: none;">👥 Sellers</a></li>
+                <li class="admin-only"><a href="products.html">🛍️ Products</a></li>
+                <li class="admin-only"><a href="billing.html">💰 Billing</a></li>
+                <li class="admin-only"><a href="bills.html">📄 Bills History</a></li>
+                <li class="admin-only"><a href="dispatched.html">📤 Dispatched</a></li>
+                <li class="admin-only"><a href="employees.html">👥 Employee Management</a></li>
+                <li class="admin-only"><a href="automation.html">⚡ Automation</a></li>
+                <li class="admin-only"><a href="return-scan.html">📷 Return Scan</a></li>
+                <li class="admin-only"><a href="backup.html">💾 Backup & Restore</a></li>
+                <li class="admin-only"><a href="sellers.html" id="sellersLink" style="display: none;">👥 Sellers</a></li>
             </ul>
         </aside>
 
         <div class="container">
         <div class="page-header">
             <h1 style="color: #ff8c00;">Orders Management</h1>
-            <div class="header-actions">
+            <div class="header-actions admin-only">
                 <button onclick="openAddOrderModal()" class="btn-primary">Add Order</button>
                 <button onclick="downloadOrderTemplate()" class="btn-secondary">Download Template</button>
                 <button onclick="openBulkUploadModal()" class="btn-secondary">Bulk Upload</button>
@@ -48,7 +48,7 @@
         </div>
 
         <div class="filters">
-            <select id="sellerFilter" onchange="loadOrders()">
+            <select id="sellerFilter" onchange="loadOrders()" class="admin-only">
                 <option value="">All Sellers</option>
             </select>
             <select id="statusFilter" onchange="loadOrders()">
@@ -67,7 +67,7 @@
         </div>
 
         <!-- Return Scan Section -->
-        <div class="scan-section" style="background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <div class="scan-section admin-only" style="background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
             <h3 style="color: #ff8c00; margin-bottom: 15px;">🔄 Return Scan</h3>
             <div style="display: flex; gap: 10px; align-items: flex-end;">
                 <div style="flex: 1;">
@@ -335,6 +335,20 @@
         .data-table td:nth-child(15) { width: 90px; } /* Paid */
         .data-table th:nth-child(16),
         .data-table td:nth-child(16) { width: 280px; } /* Actions */
+        
+        /* Status badge styling for sellers */
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+        .status-pending { background-color: #ffc107; color: #000; }
+        .status-delivered { background-color: #28a745; color: white; }
+        .status-return { background-color: #dc3545; color: white; }
+        .status-cancel { background-color: #6c757d; color: white; }
     </style>
 
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
@@ -347,12 +361,24 @@
     <script src="mobile-menu.js"></script>
     <script src="orders.js"></script>
     <script>
-        // Show sellers link for admin
+        // Show/hide elements based on role
         window.addEventListener('DOMContentLoaded', () => {
             const user = JSON.parse(localStorage.getItem('user') || '{}');
             const sellersLink = document.getElementById('sellersLink');
-            if (sellersLink && user.role === 'admin') {
-                sellersLink.style.display = 'block';
+            
+            if (user.role === 'admin') {
+                // Show all admin-only items
+                if (sellersLink) {
+                    sellersLink.style.display = 'block';
+                }
+                document.querySelectorAll('.admin-only').forEach(el => {
+                    el.style.display = el.classList.contains('header-actions') ? 'flex' : 'block';
+                });
+            } else {
+                // Hide admin-only items for sellers
+                document.querySelectorAll('.admin-only').forEach(el => {
+                    el.style.display = 'none';
+                });
             }
             
             // Optimize table performance with virtual scrolling hints
